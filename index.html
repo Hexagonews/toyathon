@@ -10,7 +10,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
     import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
 
-    // ✅ Your Firebase config
+    // ✅ Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyCOVksDxbA1cSaoZO6EOo4A4fgLbOnTH1U",
       authDomain: "toyathon-b7e70.firebaseapp.com",
@@ -41,6 +41,14 @@
       const snapshot = await get(countRef);
       let current = snapshot.val() || 0;
       current++;
+      set(countRef, current);
+    };
+
+    // ➖ Subtract one toy (only on phone)
+    window.subtractToy = async function() {
+      const snapshot = await get(countRef);
+      let current = snapshot.val() || 0;
+      current = Math.max(0, current - 1);
       set(countRef, current);
     };
   </script>
@@ -91,9 +99,9 @@
     }
 
     /* Button only visible on phones */
-    .add-button {
+    .add-button, .subtract-button {
       display: none;
-      margin-top: 40px;
+      margin-top: 20px;
       padding: 20px 50px;
       font-size: 1.5em;
       border-radius: 50px;
@@ -106,14 +114,23 @@
       transition: transform 0.2s, background-color 0.3s;
     }
 
-    .add-button:active {
+    .add-button:active, .subtract-button:active {
       transform: scale(0.95);
       background-color: #ffd633;
     }
 
+    /* Show buttons on phones */
     @media (max-width: 768px) {
-      .add-button {
+      .add-button, .subtract-button {
         display: block;
+      }
+    }
+
+    /* Bigger counter for large screens (stage) */
+    @media (min-width: 1024px) {
+      .counter {
+        font-size: 8em;
+        padding: 50px 100px;
       }
     }
   </style>
@@ -124,7 +141,9 @@
 
   <!-- Only visible on phones -->
   <button class="add-button" onclick="addToy()">+ Add Toy</button>
+  <button class="subtract-button" onclick="subtractToy()">- Remove Toy</button>
 </body>
 </html>
+
 
 
