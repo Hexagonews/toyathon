@@ -3,97 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Telethon Toy Counter</title>
+  <title>Telethon Toy Donation Counter</title>
 
-  <!-- Telethon-themed styles -->
-  <style>
-    :root {
-      --telethon-blue: #0078d7;
-      --telethon-red: #e21b23;
-      --telethon-yellow: #ffcb05;
-    }
-
-    body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, var(--telethon-blue), var(--telethon-red));
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      text-align: center;
-    }
-
-    h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      margin-bottom: 10px;
-      color: var(--telethon-yellow);
-      text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
-    }
-
-    #count {
-      font-size: 8vw;
-      font-weight: 900;
-      margin: 20px 0;
-      text-shadow: 3px 3px 10px rgba(0,0,0,0.5);
-    }
-
-    @media (min-width: 768px) {
-      #count {
-        font-size: 12vw;
-      }
-    }
-
-    /* Buttons visible only on phones */
-    .controls {
-      display: none;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    @media (max-width: 768px) {
-      .controls {
-        display: flex;
-      }
-    }
-
-    button {
-      background: var(--telethon-yellow);
-      color: #000;
-      font-size: 1.2rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 12px;
-      padding: 15px 30px;
-      cursor: pointer;
-      transition: 0.25s;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-
-    button:hover {
-      transform: scale(1.05);
-      background: white;
-    }
-  </style>
-</head>
-
-<body>
-  <h1>Telethon Toy Counter 🎉</h1>
-  <div id="count">0</div>
-
-  <!-- Buttons only visible on mobile -->
-  <div class="controls">
-    <button id="addToy">➕ Add Toy</button>
-    <button id="removeToy">➖ Subtract Toy</button>
-  </div>
-
+  <!-- Firebase SDKs -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+    import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
 
+    // ✅ Your Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyCOVksDxbA1cSaoZO6EOo4A4fgLbOnTH1U",
       authDomain: "toyathon-b7e70.firebaseapp.com",
@@ -109,32 +26,105 @@
     const db = getDatabase(app);
     const countRef = ref(db, "toyCount");
 
-    const countDisplay = document.getElementById("count");
-    const addBtn = document.getElementById("addToy");
-    const removeBtn = document.getElementById("removeToy");
+    const counter = document.getElementById("counter");
 
-    // Update count live
+    // 🎯 Show live updates
     onValue(countRef, (snapshot) => {
       const count = snapshot.val() || 0;
-      countDisplay.textContent = count;
+      counter.textContent = count;
+      counter.classList.add("animate");
+      setTimeout(() => counter.classList.remove("animate"), 300);
     });
 
-    // Add a toy
-    addBtn.addEventListener("click", async () => {
+    // ➕ Add one toy (only on phone)
+    window.addToy = async function () {
       const snapshot = await get(countRef);
-      let count = snapshot.val() || 0;
-      set(countRef, count + 1);
-    });
-
-    // Subtract a toy
-    removeBtn.addEventListener("click", async () => {
-      const snapshot = await get(countRef);
-      let count = snapshot.val() || 0;
-      if (count > 0) {
-        set(countRef, count - 1);
-      }
-    });
+      let current = snapshot.val() || 0;
+      current++;
+      set(countRef, current);
+    };
   </script>
+
+  <!-- Style -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #004aad, #ffce00, #e41e26);
+      background-size: 300% 300%;
+      animation: gradientMove 10s ease infinite;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      color: white;
+      text-align: center;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h1 {
+      font-size: 2em;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
+    }
+
+    .counter {
+      font-size: 5em;
+      font-weight: bold;
+      background: white;
+      color: #004aad;
+      padding: 30px 60px;
+      border-radius: 25px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease;
+    }
+
+    .counter.animate {
+      transform: scale(1.1);
+    }
+
+    /* Button only visible on phones */
+    .add-button {
+      display: none;
+      margin-top: 40px;
+      padding: 20px 50px;
+      font-size: 1.5em;
+      border-radius: 50px;
+      border: none;
+      background-color: #ffce00;
+      color: #004aad;
+      font-weight: bold;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.3s;
+    }
+
+    .add-button:active {
+      transform: scale(0.95);
+      background-color: #ffd633;
+    }
+
+    @media (max-width: 768px) {
+      .add-button {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Telethon Toy Donations</h1>
+  <div id="counter" class="counter">0</div>
+
+  <!-- Only visible on phones -->
+  <button class="add-button" onclick="addToy()">+ Add Toy</button>
 </body>
 </html>
+
 
